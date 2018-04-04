@@ -2,7 +2,7 @@
 
 *colourify backtrace output in GDB with Python API*
 
-## Usage
+## Overview
 
 **GDB Colour Filter** implements frame filter for GDB Python API. There could
 be several chained filters. GDB calls this filter on each element(frame) of
@@ -11,6 +11,8 @@ This filter is defined for the lowest priority so it is the last filter that is
 called before printing stack trace.
 
 ![Colouring example](docs/example.png)
+
+## Installation
 
 Installation is quite straight forward. It is needed only put `color_filter.py`
 in some directory and include it into your `.gdbinit` file. In order to do the first step one could clone whole repository
@@ -33,3 +35,7 @@ manner.
 ```bash
     source .gdb/gdb-colour-filter/colour_filter.py
 ```
+
+## Credits
+
+&copy; Daniel Bershatsky \<[daniel.bershatsky@skolkovotech.ru](mailto:daniel.bershatsky@skolkovotech.ru)\>, 2018
