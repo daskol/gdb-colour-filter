@@ -1,0 +1,2 @@
+# ignore python 3 cache
+__cache__/
