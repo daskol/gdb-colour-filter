@@ -4,9 +4,9 @@
 
 from typing import Iterator, Text
 
+from gdb import parameter as get_parameter
 from gdb import Frame, frame_filters, execute
 from gdb.FrameDecorator import FrameDecorator
-import gdb
 
 
 SCREEN_WIDTH = 160
@@ -28,19 +28,22 @@ class FrameColorizer(FrameDecorator):
         self.frame = super(FrameColorizer, self).inferior_frame()
 
     def __str__(self):
-        is_print_address = gdb.parameter('print address')
+        is_print_address = get_parameter('print address')
 
         part1 = self.depth()
-        if is_print_address:
-            part1 += '  ' + self.address() + ' in '
-
-        shift_width = int(len(part1) / 2 - int(is_print_address))
         part2 = self.function() + ' \033[1;37m(' + self.frame_args() + ')\033[0m'
         part3 = self.filename() + self.line()
+
+        if is_print_address:
+            part1 += '  ' + self.address() + ' in '
+        else:
+            part1 += ' '
 
         parts = part1 + part2 + ' at ' + part3
 
         if len(parts) > self.get_screen_width():
+            shift_width = int(self.length(part1)) - 1
+            shift_width -= 3 * int(is_print_address)  # compensate ' in ' part
             value = part1 + part2 + '\n'
             value += ' ' * shift_width + ' at ' + part3
         else:
@@ -79,7 +82,8 @@ class FrameColorizer(FrameDecorator):
             if not sym.is_argument:
                 continue;
             val = sym.value(self.frame)
-            args.append('%s=%s' % (sym, val))
+            arg = '%s=%s' % (sym, val) if str(val) else str(sym)
+            args.append(arg)
 
         return ', '.join(args)
 
@@ -127,6 +131,30 @@ class FrameColorizer(FrameDecorator):
     def line(self):
         value = super(FrameColorizer, self).line()
         return '\033[0;35m:%d\033[0m' % value if value else ''
+
+    @staticmethod
+    def length(colored_string):
+        """This function calculates length of string with terminal control
+        sequences.
+        """
+        start = 0
+        term_seq_len = 0
+
+        while True:
+            begin = colored_string.find('\033', start)
+
+            if begin == -1:
+                break
+
+            end = colored_string.find('m', begin)
+
+            if end == -1:
+                end = len(s)
+
+            term_seq_len += end - begin + 1
+            start = end
+
+        return len(colored_string) - term_seq_len
 
 
 class FilterProxy:
