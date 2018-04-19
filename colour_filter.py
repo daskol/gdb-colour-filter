@@ -6,6 +6,7 @@ from typing import Iterator, Text
 
 from gdb import Frame, frame_filters, execute
 from gdb.FrameDecorator import FrameDecorator
+import gdb
 
 
 SCREEN_WIDTH = 160
@@ -27,15 +28,21 @@ class FrameColorizer(FrameDecorator):
         self.frame = super(FrameColorizer, self).inferior_frame()
 
     def __str__(self):
-        part1 = self.depth() + '  ' + self.address()
+        is_print_address = gdb.parameter('print address')
+
+        part1 = self.depth()
+        if is_print_address:
+            part1 += '  ' + self.address() + ' in '
+
+        shift_width = int(len(part1) / 2 - int(is_print_address))
         part2 = self.function() + ' \033[1;37m(' + self.frame_args() + ')\033[0m'
         part3 = self.filename() + self.line()
 
-        parts = part1 + ' in ' + part2 + ' at ' + part3
+        parts = part1 + part2 + ' at ' + part3
 
         if len(parts) > self.get_screen_width():
-            value = part1 + ' in ' + part2 + '\n'
-            value += ' ' * int(len(part1) / 2 + 1) + ' at ' + part3
+            value = part1 + part2 + '\n'
+            value += ' ' * shift_width + ' at ' + part3
         else:
             value = parts
 
