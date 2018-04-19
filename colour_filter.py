@@ -9,9 +9,6 @@ from gdb import Frame, frame_filters, execute
 from gdb.FrameDecorator import FrameDecorator
 
 
-SCREEN_WIDTH = 160
-
-
 class FrameColorizer(FrameDecorator):
     """FrameColorizer repeats all actions to get all common frame attribute and
     then spices a bit output with colours. Format of output string is following.
@@ -120,13 +117,8 @@ class FrameColorizer(FrameDecorator):
 
     def get_screen_width(self):
         """Get screen width from GDB. Source format is following
-        > Number of characters gdb thinks are in a line is 174.
         """
-        # TODO: get screen width
-        #string = gdb.execute('show width', True, False)
-        #_, last = string.rsplit(' ', 1)
-        #return int(last[:-1])
-        return SCREEN_WIDTH
+        return get_parameter('width')
 
     def line(self):
         value = super(FrameColorizer, self).line()
