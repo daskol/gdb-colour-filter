@@ -38,7 +38,8 @@ class FrameColorizer(FrameDecorator):
 
         parts = part1 + part2 + ' at ' + part3
 
-        if len(parts) > self.get_screen_width():
+        screen_width = self.get_screen_width()
+        if screen_width is not None and len(parts) > screen_width:
             shift_width = int(self.length(part1)) - 1
             shift_width -= 3 * int(is_print_address)  # compensate ' in ' part
             value = part1 + part2 + '\n'
