@@ -33,7 +33,7 @@ After that `colour_filter.py` should be included in `.gdbinit` in following
 manner.
 
 ```bash
-    source .gdb/gdb-colour-filter/colour_filter.py
+    source ~/.gdb/gdb-colour-filter/colour_filter.py
 ```
 
 ## Credits
